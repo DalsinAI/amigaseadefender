@@ -30,8 +30,12 @@ CPU       ?= -m68040 -m68881
 OPT       ?= -O2 -fomit-frame-pointer -fno-tree-loop-distribute-patterns
 
 DEFS      = -D__amigaos__
+# pthread.h first: the stove's pthread.h wraps read() and close() in
+# macros when unistd.h came before it, which breaks libstdc++'s
+# istream::read (upstream's misc.h has unistd.h before iostream)
+CXXPRE    = -include pthread.h
 INC       = -Iamiga/include -I$(SD) -I$(SD)/snoutlib -I$(SDLKIT)/include
-CXXFLAGS  = -noixemul $(OPT) $(CPU) -std=gnu++11 -fno-exceptions -fno-rtti -w $(DEFS) $(INC)
+CXXFLAGS  = -noixemul $(OPT) $(CPU) -std=gnu++11 -fno-exceptions -fno-rtti -w $(CXXPRE) $(DEFS) $(INC)
 CFLAGS    = -noixemul $(OPT) $(CPU) -std=gnu99 -Wall $(DEFS) -Iamiga/include -I$(TESS)/Include \
             -I$(SDLKIT)/include -I$(SDLKIT)/include/SDL2
 TFLAGS    = -noixemul $(OPT) $(CPU) -std=gnu99 -w -I$(TESS)/Include
