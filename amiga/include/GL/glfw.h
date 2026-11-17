@@ -5,11 +5,13 @@
 #ifndef SD_AMIGA_GLFW_H
 #define SD_AMIGA_GLFW_H
 
-#ifndef GL_GLEXT_PROTOTYPES
-#define GL_GLEXT_PROTOTYPES 1
+/* GL/gl.h only, as GLFW 2.7's glfw.h has it: Sea Defender's gldefs.h
+ * declares its own extension types and fetches the calls by name, which
+ * glext.h's newer declarations would clash with. */
+#ifndef GL_GLEXT_LEGACY
+#define GL_GLEXT_LEGACY 1
 #endif
 #include <GL/gl.h>
-#include <GL/glext.h>
 #include <GL/glu.h>
 
 #ifdef __cplusplus
@@ -30,6 +32,29 @@ extern "C" {
 #define GLFW_KEY_ESC (GLFW_KEY_SPECIAL + 1)
 #define GLFW_KEY_F1 (GLFW_KEY_SPECIAL + 2)
 #define GLFW_KEY_F12 (GLFW_KEY_SPECIAL + 13)
+#define GLFW_KEY_F2 (GLFW_KEY_SPECIAL + 3)
+#define GLFW_KEY_F3 (GLFW_KEY_SPECIAL + 4)
+#define GLFW_KEY_F4 (GLFW_KEY_SPECIAL + 5)
+#define GLFW_KEY_F5 (GLFW_KEY_SPECIAL + 6)
+#define GLFW_KEY_F6 (GLFW_KEY_SPECIAL + 7)
+#define GLFW_KEY_F7 (GLFW_KEY_SPECIAL + 8)
+#define GLFW_KEY_F8 (GLFW_KEY_SPECIAL + 9)
+#define GLFW_KEY_F9 (GLFW_KEY_SPECIAL + 10)
+#define GLFW_KEY_F10 (GLFW_KEY_SPECIAL + 11)
+#define GLFW_KEY_F11 (GLFW_KEY_SPECIAL + 12)
+#define GLFW_KEY_F13 (GLFW_KEY_SPECIAL + 14)
+#define GLFW_KEY_F14 (GLFW_KEY_SPECIAL + 15)
+#define GLFW_KEY_F15 (GLFW_KEY_SPECIAL + 16)
+#define GLFW_KEY_F16 (GLFW_KEY_SPECIAL + 17)
+#define GLFW_KEY_F17 (GLFW_KEY_SPECIAL + 18)
+#define GLFW_KEY_F18 (GLFW_KEY_SPECIAL + 19)
+#define GLFW_KEY_F19 (GLFW_KEY_SPECIAL + 20)
+#define GLFW_KEY_F20 (GLFW_KEY_SPECIAL + 21)
+#define GLFW_KEY_F21 (GLFW_KEY_SPECIAL + 22)
+#define GLFW_KEY_F22 (GLFW_KEY_SPECIAL + 23)
+#define GLFW_KEY_F23 (GLFW_KEY_SPECIAL + 24)
+#define GLFW_KEY_F24 (GLFW_KEY_SPECIAL + 25)
+#define GLFW_KEY_F25 (GLFW_KEY_SPECIAL + 26)
 #define GLFW_KEY_UP (GLFW_KEY_SPECIAL + 27)
 #define GLFW_KEY_DOWN (GLFW_KEY_SPECIAL + 28)
 #define GLFW_KEY_LEFT (GLFW_KEY_SPECIAL + 29)
