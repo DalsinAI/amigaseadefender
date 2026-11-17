@@ -1,0 +1,28 @@
+Sea Defender: licences
+======================
+
+The game: Sea Defender, Copyright (c) 2010 Jan Dvorak,
+https://github.com/snoutmate/Sea-Defender
+
+- The program is under the MIT licence (LICENSE-MIT.txt), with the
+  exceptions upstream's README names (README-SeaDefender.txt):
+  - math3d++, Copyright (c) 2004-2005 Markus Trenkwalder, under its own
+    BSD-style terms in each of its headers;
+  - the Kronika font (data/fonts/kronika.svg), by Apostrophic Laboratory,
+    http://apostrophiclab.pedroreina.net/;
+  - the OpenGL logo (data/model/OpenGL_logo_flat.svg), shown on the
+    loading screen; OpenGL and its logo are trademarks of Hewlett Packard
+    Enterprise, used here as upstream does, to say what draws the game;
+  - snoutlib/perlin.cpp, from flipcode's Perlin noise class.
+  All the game's data are built into the program; there are no data files.
+- libtess2, the polygon tessellator the GLU tessellator calls are built
+  on, is Silicon Graphics' and Mikko Mononen's, under the SGI Free
+  Software Licence B 2.0 (LICENSE-libtess2.txt),
+  https://github.com/memononen/libtess2
+- SDL and OpenGL are GFOpenUp's (LIBS:GFOpenGPU/).
+- The Amiga port's own files (amiga/, AMIGA_PORT.md, tests/, tools/,
+  package/) are under the MIT licence, like Sea Defender; the GlowIcon art
+  is The AmiCradle Team's own. The GLFW and GLU calls in amiga/ are our own
+  code, written from those libraries' documented interfaces.
+
+Designed, tested and delivered by The AmiCradle Team.
