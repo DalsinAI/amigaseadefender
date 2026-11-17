@@ -1,0 +1,14 @@
+Sea Defender: controls
+======================
+
+Mouse          aim (the cross-hair)
+Left button    fire a missile from the left ship at the cross-hair
+Right button   fire a missile from the right ship
+P              pause, and P again to go on
+Esc            back to the menu
+Cursor keys    move in the menus; Return chooses
+Alt + F4       quit at once (or Quit in the menu)
+
+A new high score asks for your name: type it, Backspace to rub out,
+Return to keep it. High scores go to sea.hsc and the settings to sea.cfg,
+both in the game's drawer.

@@ -1,0 +1,11 @@
+# What package/build-amiga.sh fetches (none of it is kept in this repository).
+# Upstream Sea Defender: Jan Dvorak's 2010 missile-command game, MIT (its
+# font Kronika from Apostrophic Laboratory, math3d++ BSD-style; see its
+# README). Its data are built into the program.
+SD_URL=https://github.com/snoutmate/Sea-Defender
+SD_COMMIT=d628051d540da953bbc0bbf1f02b9b850b62acc2
+PORT_VERSION=1.0-gfos1
+# libtess2, the SGI polygon tessellator GLU's is (SGI Free Software
+# Licence B 2.0), for the GLU tessellator calls (amiga/sd_glutess.c).
+LIBTESS2_URL=https://github.com/memononen/libtess2
+LIBTESS2_COMMIT=8dbd6483e920311a58c9af10a10beb278efebc36

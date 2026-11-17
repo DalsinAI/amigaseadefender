@@ -1,0 +1,53 @@
+diff --git a/snoutlib/mfont.cpp b/snoutlib/mfont.cpp
+index 875c34e..847fa23 100644
+--- a/snoutlib/mfont.cpp
++++ b/snoutlib/mfont.cpp
+@@ -317,9 +317,10 @@ void MFont::read_from_data(void) {
+ 
+ float MFont::get_num(void)
+ {
+-  const unsigned short *num = reinterpret_cast<const unsigned short*>(&m_data[m_data_ptr]);
++  // little-endian 16-bit, byte by byte: the same on every machine
++  unsigned short num = m_data[m_data_ptr] | (m_data[m_data_ptr + 1] << 8);
+   m_data_ptr += 2; // 16-bit
+-  return ((float)*num / m_divisor);
++  return ((float)num / m_divisor);
+ }
+ 
+ vec2 MFont::get_vec2(void)
+diff --git a/snoutlib/settings.cpp b/snoutlib/settings.cpp
+index 3d0e822..a34bb08 100644
+--- a/snoutlib/settings.cpp
++++ b/snoutlib/settings.cpp
+@@ -3,8 +3,14 @@
+ #include "settings.h"
+ 
+ Settings::Settings(void) :
++#ifdef __amigaos__
++  // the game's own 16:10, on a screen of its own
++  m_res_x(640), m_res_y(400),
++  m_fullscreen(true),
++#else
+   m_res_x(1024), m_res_y(768),
+   m_fullscreen(false),
++#endif
+   m_fsaa(0), m_vsync(false),
+   m_mouse_sensitivity(6),
+   m_fname("")
+diff --git a/snoutlib/staticmesh.cpp b/snoutlib/staticmesh.cpp
+index ac508c0..1f055a1 100644
+--- a/snoutlib/staticmesh.cpp
++++ b/snoutlib/staticmesh.cpp
+@@ -105,9 +105,10 @@ void StaticMesh::draw(void)
+ 
+ float StaticMesh::get_num(void)
+ {
+-  const unsigned short *num = reinterpret_cast<const unsigned short*>(&m_data[m_data_ptr]);
++  // little-endian 16-bit, byte by byte: the same on every machine
++  unsigned short num = m_data[m_data_ptr] | (m_data[m_data_ptr + 1] << 8);
+   m_data_ptr += 2; // 16-bit
+-  return ((float)*num / m_divisor);
++  return ((float)num / m_divisor);
+ }
+ 
+ vec2 StaticMesh::get_vec2(void)

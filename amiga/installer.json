@@ -1,0 +1,15 @@
+{
+  "name": "SeaDefender",
+  "version": "1.0-gfos1",
+  "drawer": "SeaDefender",
+  "program": "SeaDefender",
+  "cpu": "68040",
+  "fpu": true,
+  "space": 1000000,
+  "modules": ["SDL2.module", "GL.module"],
+  "libraries": [],
+  "keep": ["sea.hsc", "sea.cfg"],
+  "parent": "Work:Games",
+  "badge": "icons/art/seadefender.png",
+  "script": "Install-SeaDefender"
+}

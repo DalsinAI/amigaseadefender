@@ -1,0 +1,113 @@
+# Sea Defender for GFOS (AmigaOS 3.2 with GFOpenUp), 68040/68060 + FPU, on
+# GFOpenUp's SDL 2 (SDL2.module) and OpenGL (GL.module).
+# GLFW 2.7: amiga/sd_glfw.c on SDL 2; GLU's tessellator: amiga/sd_glutess.c
+# on libtess2; GL extension calls: sd_gl_procs.c, written from libGL's
+# symbols by amiga/gen_gl_procs.py.
+#
+#   make -f amiga/Makefile.amigaos -j4 SD=/path/to/sea-defender \
+#        TESS=/path/to/libtess2 [STOVE=...]
+#
+# SD is upstream Sea Defender at the commit package/seadefender.lock names,
+# with amiga/patches applied; package/build-amiga.sh fetches it and libtess2.
+#
+# Output: build/amigaos/SeaDefender/ (the drawer: SeaDefender, ReadMe,
+# Controls and the licences, with GlowIcons; the game's data are built in),
+# build/amigaos/SeaDefender.info and Install-SeaDefender beside them.
+
+SD        ?= ../sea-defender
+TESS      ?= ../libtess2
+STOVE     ?= $(HOME)/AmiCradle/stoves/os32-gcc16-open6
+PREFIX    ?= $(STOVE)/prefix
+SDLKIT    ?= $(PREFIX)/m68k-amigaos
+CC        = $(PREFIX)/bin/m68k-amigaos-gcc
+CXX       = $(PREFIX)/bin/m68k-amigaos-g++
+NM        = $(PREFIX)/bin/m68k-amigaos-nm
+STRIP     = $(PREFIX)/bin/m68k-amigaos-strip
+PYTHON    ?= python3
+# hard float: the game is float throughout, and the SDL and GL kits are -m68881
+CPU       ?= -m68040 -m68881
+# -fno-tree-loop-distribute-patterns: GCC 16's loop miscompile
+OPT       ?= -O2 -fomit-frame-pointer -fno-tree-loop-distribute-patterns
+
+DEFS      = -D__amigaos__
+# pthread.h first: the stove's pthread.h wraps read() and close() in
+# macros when unistd.h came before it, which breaks libstdc++'s
+# istream::read (upstream's misc.h has unistd.h before iostream)
+CXXPRE    = -include pthread.h
+INC       = -Iamiga/include -I$(SD) -I$(SD)/snoutlib -I$(SDLKIT)/include
+CXXFLAGS  = -noixemul $(OPT) $(CPU) -std=gnu++11 -fno-exceptions -fno-rtti -w $(CXXPRE) $(DEFS) $(INC)
+CFLAGS    = -noixemul $(OPT) $(CPU) -std=gnu99 -Wall $(DEFS) -Iamiga/include -I$(TESS)/Include \
+            -I$(SDLKIT)/include -I$(SDLKIT)/include/SDL2
+TFLAGS    = -noixemul $(OPT) $(CPU) -std=gnu99 -w -I$(TESS)/Include
+LDFLAGS   = -noixemul $(CPU)
+LIBS      = -L$(SDLKIT)/lib -lSDL2 -lGL -lm -lstdc++ -lpthread
+
+BUILD     = build/amigaos
+OBJDIR    = $(BUILD)/obj
+OUT       = $(BUILD)/SeaDefender
+PROG      = SeaDefender
+
+# the objects upstream's Makefile links
+GAME      = main gamemenu layout background boat pboat pe_smoke resources credits hiscore \
+            torpedo pe_bubbles pe_bubble_expl game missile fx_missile_expl pe_smoketrail \
+            fx_ship_expl fx_torpedo_expl pe_torpedo_expl fx_moving_text \
+            snoutlib/glfwapp snoutlib/settings snoutlib/loadingscreen snoutlib/procedural \
+            snoutlib/misc snoutlib/timer snoutlib/mfont snoutlib/svg snoutlib/tesselate \
+            snoutlib/menu snoutlib/shader snoutlib/staticmesh snoutlib/rtt_fbo snoutlib/gldefs \
+            snoutlib/particles snoutlib/perlin snoutlib/bbox snoutlib/fx
+TESSSRC   = bucketalloc dict geom mesh priorityq sweep tess
+OBJS      = $(addprefix $(OBJDIR)/sd/,$(addsuffix .o,$(GAME))) \
+            $(addprefix $(OBJDIR)/tess/,$(addsuffix .o,$(TESSSRC))) \
+            $(OBJDIR)/amiga/sd_glfw.o $(OBJDIR)/amiga/sd_glutess.o \
+            $(OBJDIR)/amiga/sd_gl_procs.o $(OBJDIR)/amiga/amiga_start.o
+DOCS      = AMIGA_PORT.md amiga/Licences.txt amiga/Controls
+
+all: $(OUT)/$(PROG) package
+
+$(BUILD)/$(PROG).debug: $(OBJS)
+	@mkdir -p $(BUILD)
+	$(CXX) $(LDFLAGS) -o $@ $(OBJS) $(LIBS)
+
+$(OUT)/$(PROG): $(BUILD)/$(PROG).debug
+	@mkdir -p $(OUT)
+	$(STRIP) -o $@ $<
+
+package: $(OUT)/$(PROG) $(DOCS)
+	cp amiga/Controls $(OUT)/Controls
+	cp AMIGA_PORT.md $(OUT)/ReadMe
+	cp $(SD)/LICENSE $(OUT)/LICENSE-MIT.txt
+	cp $(SD)/README $(OUT)/README-SeaDefender.txt
+	cp $(TESS)/LICENSE.txt $(OUT)/LICENSE-libtess2.txt
+	cp amiga/Licences.txt $(OUT)/Licences.txt
+	cp amiga/icons/SeaDefender.info amiga/icons/ReadMe.info $(OUT)/
+	for f in LICENSE-MIT.txt README-SeaDefender.txt LICENSE-libtess2.txt Licences.txt Controls; do \
+	    cp amiga/icons/ReadMe.info $(OUT)/$$f.info; done
+	cp amiga/icons/SeaDefender-drawer.info $(BUILD)/SeaDefender.info
+	cp amiga/Install-SeaDefender amiga/Install-SeaDefender.info $(BUILD)/
+
+# the GL calls the game looks up by name, against libGL's own symbols
+$(BUILD)/sd_gl_procs.c: amiga/gen_gl_procs.py
+	@mkdir -p $(BUILD)
+	$(NM) $(SDLKIT)/lib/libGL.a > $(BUILD)/libGL.nm
+	$(PYTHON) amiga/gen_gl_procs.py $(BUILD)/libGL.nm $@ $(SD)/snoutlib/gldefs.cpp
+
+$(OBJDIR)/amiga/sd_gl_procs.o: $(BUILD)/sd_gl_procs.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/sd/%.o: $(SD)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/amiga/%.o: amiga/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(OBJDIR)/tess/%.o: $(TESS)/Source/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(TFLAGS) -c -o $@ $<
+
+clean:
+	rm -rf $(BUILD)
+
+.PHONY: all package clean
